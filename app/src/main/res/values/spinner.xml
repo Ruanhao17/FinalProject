@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sort">
+        <item>默认排序</item>
+        <item>按浏览量排序</item>
+        <item>按赞同数排序</item>
+        <item>按发布时间排序</item>
+    </string-array>
+    <string-array name="more">
+        <item>举报</item>
+        <item>分享</item>
+    </string-array>
+</resources>
