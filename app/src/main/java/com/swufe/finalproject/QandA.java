@@ -23,10 +23,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 
 public class QandA extends AppCompatActivity implements OnBannerListener,AdapterView.OnItemClickListener{
@@ -37,7 +40,7 @@ public class QandA extends AppCompatActivity implements OnBannerListener,Adapter
     public String[] tag1;
     public String[] tag2;
     public String[] content;
-    public String[] picture;
+    public String[] id;
     public int[] reputation;
     public boolean[] is_anwser;
     public int[] heat;
@@ -56,6 +59,8 @@ public class QandA extends AppCompatActivity implements OnBannerListener,Adapter
         List list = Arrays.asList(urls);
         Log.i(TAG,"list:"+list);
 
+
+
         images = new ArrayList(list);
         //设置自动轮播，默认为true
         banner.isAutoPlay(true);
@@ -65,6 +70,7 @@ public class QandA extends AppCompatActivity implements OnBannerListener,Adapter
                 .setImageLoader(new GlideImageLoader())
                 .setOnBannerListener(this)
                 .start();
+
         Bmob.initialize(this, "5b5e2b1c75af83d4316468eb9ae614c4");
         BmobQuery<Question> bmobQuery = new BmobQuery<>();
         Question Q = new Question();
@@ -80,10 +86,11 @@ public class QandA extends AppCompatActivity implements OnBannerListener,Adapter
                     is_anwser=new boolean[count];
                     heat=new int[count];
                     price=new float[count];
+                    id =new String[count];
 
                     for(int i=0;i<count;i++) {
 
-                        Log.i(TAG,object.get(i).getObjectId());
+                        id[i] = object.get(i).getObjectId();
                         tag1[i]=object.get(i).getTag1();
                         tag2[i]=object.get(i).getTag2();
                         content[i]=object.get(i).getAbstract_content();
@@ -107,23 +114,29 @@ public class QandA extends AppCompatActivity implements OnBannerListener,Adapter
 
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        TextView itemtag1 = view.findViewById(R.id.itemTag1);
-        TextView itemtag2 = view.findViewById(R.id.itemTag2);
-        TextView itemheat = view.findViewById(R.id.textView11);
-        TextView itemAcontent = view.findViewById(R.id.Acontent);
-        String tag1 = itemtag1.getText().toString();
-        String tag2 = itemtag2.getText().toString();
-        String heat = itemheat.getText().toString();
-        String Acontent = itemAcontent.getText().toString();
+        TextView id_content = view.findViewById(R.id.Id);
+        String idInfo = id_content.getText().toString();
+        Question question = new Question();
+        question.setHeat(question.getHeat()+2);
+        question.update(idInfo, new UpdateListener() {
 
+            @Override
+            public void done(BmobException e) {
+                if(e==null){
+                    Toast.makeText(QandA.this, "更新成功"+question.getUpdatedAt(), Toast.LENGTH_SHORT).show();
+                }else{;
+                    Toast.makeText(QandA.this, "更新失败"+ e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        });
+        Log.i("bmob","id="+idInfo);
+        Log.i(TAG, "onItemClick: "+question.getHeat()+1);
+        Log.i(TAG, "onItemClick: "+question.getHeat()+1);
         Intent i = new Intent(this,Question_detail.class);
-        i.putExtra("tag1",tag1);
-        i.putExtra("tag2",tag2);
-        i.putExtra("heat",heat);
-        i.putExtra("Acontent",Acontent);
+        i.putExtra("id",idInfo);
+
         startActivity(i);
-
-
     }
     public void onclick(View v){
         Intent i = new Intent(this,AddQuestion.class);
@@ -175,14 +188,15 @@ public class QandA extends AppCompatActivity implements OnBannerListener,Adapter
             map.put("ItemIs_anwser",is_anwser[i]==true ? "[已解答]":"[待解答]");
             map.put("ItemHeat",heat[i]);
             map.put("ItemPrice",price[i]);
+            map.put("ID",id[i]);
             map.put("Acontent",content[i]);
 
             listItems.add(map);
         }
         //生成适配器的Item和动态数组对应的元素\
         myAdapter = new SimpleAdapter(this,listItems,R.layout.question_items,
-                new String[]{"ItemTag1", "ItemTag2","ItemContent","ItemReputation","ItemIs_anwser","ItemHeat","ItemPrice","Acontent"},
-                new int[]{R.id.itemTag1, R.id.itemTag2,R.id.itemContent,R.id.textView6,R.id.textView7,R.id.textView11,R.id.textView9,R.id.Acontent});
+                new String[]{"ItemTag1", "ItemTag2","ItemContent","ItemReputation","ItemIs_anwser","ItemHeat","ItemPrice","Acontent","ID"},
+                new int[]{R.id.itemTag1, R.id.itemTag2,R.id.itemContent,R.id.textView6,R.id.textView7,R.id.textView11,R.id.textView9,R.id.Acontent,R.id.Id});
         myListView.setAdapter(myAdapter);
         myListView.setOnItemClickListener(this);
     }

@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="280dp"
             android:layout_marginTop="10dp"
+            android:onClick="onclick3"
             android:text="@string/AddQ"
             android:textColor="#2196F3"
             android:textSize="18sp" />
@@ -47,6 +48,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#E7EAEC"
+        android:onClick="onclick2"
         android:text="点击添加附件"
         android:textColor="#030303" />
+
+    <ListView
+        android:id="@+id/file_item"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
 </LinearLayout>
